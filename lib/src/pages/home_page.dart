@@ -1,9 +1,10 @@
 import 'package:barcode_scan/barcode_scan.dart';
 import 'package:flutter/material.dart';
+import 'package:sqcanner_qr_flutter/src/bloc/scans_bloc.dart';
 import 'package:sqcanner_qr_flutter/src/models/scan_model.dart';
 import 'package:sqcanner_qr_flutter/src/pages/direcciones_page.dart';
 import 'package:sqcanner_qr_flutter/src/pages/mapas_page.dart';
-import 'package:sqcanner_qr_flutter/src/providers/db_provider.dart';
+import 'package:sqcanner_qr_flutter/src/utils/utils.dart' as utils;
 
 class HomePage extends StatefulWidget {
   @override
@@ -13,6 +14,7 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
 
   int _currentIndex = 0;
+  final _scansBloc = new ScansBloc();
 
   @override
   Widget build(BuildContext context) {
@@ -22,7 +24,9 @@ class _HomePageState extends State<HomePage> {
         actions: <Widget>[
           IconButton(
             icon: Icon(Icons.delete_forever),
-            onPressed: (){ },
+            onPressed: (){
+              _scansBloc.borrarTodosScans();
+            },
           )
         ],
       ),
@@ -31,17 +35,15 @@ class _HomePageState extends State<HomePage> {
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
       floatingActionButton: FloatingActionButton(
         child: Icon(Icons.filter_center_focus),
-        onPressed: _scanQR,
+        onPressed: () => _scanQR(context),
         backgroundColor: Theme.of(context).primaryColor,
       ),
     );
   }
 
-  void _scanQR() async{
-    //String futureString;
-    String futureString = "https://flutter.dev/";
-
-    /*try{
+  void _scanQR(BuildContext context) async{
+    String futureString;
+    try{
       var result = await BarcodeScanner.scan(options: ScanOptions(
         //autoEnableFlash: true,
         strings: {
@@ -51,16 +53,14 @@ class _HomePageState extends State<HomePage> {
         }
       ));
       futureString = result.rawContent;
+      if(futureString != null){
+        print("Contenido del Scan: $futureString");
+        final scan = ScanModel(valor: futureString);
+        _scansBloc.agregarScan(scan);
+        utils.abrirScan(context, scan);
+      }
     }catch (e){
       futureString = e.toString();
-    }*/
-
-    if(futureString != null){
-       print("Contenido del Scan: $futureString");
-       final scan = ScanModel(
-         valor: futureString
-       );
-       DBProvider.db.nuevoScan(scan);
     }
   }
 
