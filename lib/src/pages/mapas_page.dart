@@ -17,6 +17,9 @@ class MapasPage extends StatelessWidget {
         if(!snapshot.hasData){
           return Center(child: CircularProgressIndicator());
         }
+        if(snapshot.hasError){
+
+        }
         final scans = snapshot.data;
         if(scans.isEmpty){
           return Center(child: Text("No hay información"));
